@@ -19,3 +19,8 @@ export interface SystemConfig {
   distance: number;
   speed: number;
 }
+
+export interface CarData {
+  id: number;
+  x: number;
+}
