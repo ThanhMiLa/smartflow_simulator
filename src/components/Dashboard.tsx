@@ -1,13 +1,15 @@
-import React from 'react';
-import { Terminal as TerminalIcon, Settings, Truck, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Terminal as TerminalIcon, Settings, Play } from 'lucide-react';
 import type { LogEntry, LogType } from '../types';
 
 interface Props {
   logs: LogEntry[];
-  onTrigger: (k: number) => void;
+  onTestCase: (testCase: number, cars: number) => void;
 }
 
-export const Dashboard: React.FC<Props> = ({ logs, onTrigger }) => {
+export const Dashboard: React.FC<Props> = ({ logs, onTestCase }) => {
+  const [cars, setCars] = useState<number>(30);
+
   const getLogColor = (type: LogType) => {
     switch (type) {
       case 'error': return 'text-rose-400';
@@ -18,29 +20,48 @@ export const Dashboard: React.FC<Props> = ({ logs, onTrigger }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-72">
-      <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-        <h3 className="text-xs font-bold text-slate-300 mb-6 flex items-center gap-2 uppercase tracking-wider">
-          <Settings size={16} className="text-cyan-400" /> Giả lập AI Trigger
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[400px]">
+      <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 flex flex-col">
+        <h3 className="text-xs font-bold text-slate-300 mb-4 flex items-center gap-2 uppercase tracking-wider">
+          <Settings size={16} className="text-cyan-400" /> Cài đặt Kịch bản Test
         </h3>
-        <button onClick={() => onTrigger(20)} className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-3 mb-4 shadow-lg shadow-blue-900/50">
-          <Truck size={20} /> GỬI 20 XE TỪ A
-        </button>
-        <button onClick={() => onTrigger(60)} className="w-full bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold py-3 rounded-xl border border-rose-500/30">
-          <AlertTriangle size={18} /> KHẨN CẤP: 60 XE
-        </button>
+        
+        <div className="mb-6">
+          <label className="text-xs text-slate-400 mb-2 block uppercase font-bold">Số lượng xe dự kiến (K)</label>
+          <input 
+            type="number" 
+            value={cars}
+            onChange={(e) => setCars(Number(e.target.value) || 0)}
+            className="w-full bg-slate-800/80 border border-slate-600 rounded-lg p-3 text-white font-mono text-xl text-center outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all shadow-inner"
+          />
+        </div>
+
+        <div className="flex-1 flex flex-col gap-3">
+          <button onClick={() => onTestCase(1, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold py-3.5 rounded-xl border border-emerald-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-emerald-900/20">
+            <Play size={18} /> TEST KỊCH BẢN 1 (ĐỎ &gt; 36s)
+          </button>
+          <button onClick={() => onTestCase(2, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold py-3.5 rounded-xl border border-amber-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-amber-900/20">
+            <Play size={18} /> TEST KỊCH BẢN 2 (ĐỎ &lt; 36s)
+          </button>
+          <button onClick={() => onTestCase(3, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold py-3.5 rounded-xl border border-rose-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-rose-900/20">
+            <Play size={18} /> TEST KỊCH BẢN 3 (ĐANG XANH)
+          </button>
+        </div>
       </div>
 
-      <div className="lg:col-span-2 bg-[#0a0a0a] rounded-2xl p-5 border border-white/10 overflow-y-auto">
-        <div className="sticky top-0 bg-[#0a0a0a] pb-2 mb-2 border-b border-white/10 flex items-center gap-2 text-slate-400 text-[10px] font-bold tracking-widest z-10">
-          <TerminalIcon size={14} className="text-emerald-400" /> SYSTEM REAL-TIME LOGIC
+      <div className="lg:col-span-2 bg-[#0a0a0a] rounded-2xl p-5 border border-white/10 flex flex-col relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-30" />
+        <div className="sticky top-0 bg-[#0a0a0a] pb-3 mb-2 border-b border-white/10 flex items-center gap-2 text-slate-400 text-[10px] font-bold tracking-widest z-10 shrink-0">
+          <TerminalIcon size={14} className="text-cyan-400" /> SYSTEM REAL-TIME LOGIC (TERMINAL)
         </div>
-        {logs.map((log) => (
-          <div key={log.id} className="flex gap-4 text-xs font-mono mb-1">
-            <span className="text-slate-600 shrink-0">[{log.time}]</span>
-            <span className={getLogColor(log.type)}>{log.msg}</span>
-          </div>
-        ))}
+        <div className="flex-1 overflow-y-auto">
+          {logs.map((log) => (
+            <div key={log.id} className="flex gap-4 text-xs font-mono mb-2 leading-relaxed">
+              <span className="text-slate-600 shrink-0">[{log.time}]</span>
+              <span className={getLogColor(log.type)}>{log.msg}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

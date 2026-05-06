@@ -1,4 +1,4 @@
-export type LightState = 'GREEN' | 'RED';
+export type LightState = 'GREEN' | 'YELLOW' | 'RED';
 export type LogType = 'info' | 'warning' | 'error' | 'success';
 
 export interface LogEntry {

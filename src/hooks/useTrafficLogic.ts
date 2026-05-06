@@ -10,14 +10,26 @@ export const useTrafficLogic = (
   const [light, setLight] = useState<LightState>(initialLight);
   const [timer, setTimer] = useState<number>(initialTimer);
 
+  const forceState = (newLight: LightState, newTimer: number) => {
+    setLight(newLight);
+    setTimer(newTimer);
+  };
+
   // Vòng lặp đếm ngược cơ bản
   useEffect(() => {
     const ticker = setInterval(() => {
       setTimer((t) => {
         if (t <= 1) {
-          const nextLight = light === 'GREEN' ? 'RED' : 'GREEN';
-          setLight(nextLight);
-          return nextLight === 'GREEN' ? 22 : 26; // Chu kỳ mặc định
+          if (light === 'GREEN') {
+            setLight('YELLOW');
+            return 3;
+          } else if (light === 'YELLOW') {
+            setLight('RED');
+            return 36;
+          } else {
+            setLight('GREEN');
+            return 22;
+          }
         }
         return t - 1;
       });
@@ -35,11 +47,11 @@ export const useTrafficLogic = (
       }
       setTimer(offset);
     } else {
-      addLog(`[${name}] KB 3: Lệch nhịp! Cắt Xanh, chèn pha Đỏ ${offset}s ngay.`, 'error');
+      addLog(`[${name}] KB 3: Lệch nhịp (đang ${light})! Cắt pha hiện tại, chèn pha Đỏ ${offset}s ngay.`, 'error');
       setLight('RED');
       setTimer(offset);
     }
   };
 
-  return { light, timer, setLight, setTimer, applyCoordination };
+  return { light, timer, setLight, setTimer, forceState, applyCoordination };
 };

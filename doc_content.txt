@@ -1,0 +1,68 @@
+TÀI LIỆU KỸ THUẬT: THUẬT TOÁN ĐIỀU KHIỂN GIAO THÔNG MẠNG LƯỚI SMARTFLOW
+1. Kiến trúc Hệ thống & Nguyên lý Cốt lõi
+Cấu trúc Dữ liệu LinkedList (Node nối Node): Các ngã tư trên trục đường chính được liên kết theo dạng chuỗi (Node A -> Node B -> Node C). Mỗi Node chỉ giao tiếp và gửi tín hiệu dự báo cho Node liền kề phía sau nó. Mạng lưới có thể mở rộng vô hạn mà không cần siêu máy chủ trung tâm.
+Loại bỏ Bảng LED đếm ngược: Hệ thống sử dụng cụm đèn tín hiệu không có số đếm ngược cho xe cơ giới. Điều này cho phép AI có toàn quyền "Cắt pha" hoặc "Kéo dài pha" linh hoạt mà không gây giật mình hay hoảng loạn tâm lý cho tài xế.
+Nguyên lý Đánh đổi (Trade-off) - Ưu tiên trục chính: Luôn ưu tiên thiết lập "Làn sóng xanh" (Green Wave) cho đoàn xe trên trục chính để tối ưu hóa tổng năng lực giải phóng mặt đường, chấp nhận hy sinh cục bộ thời gian chờ của các hướng cắt ngang (sẽ được bù giờ ở chu kỳ sau).
+2. Bối cảnh & Thông số Mô phỏng
+Để minh họa luồng hoạt động của thuật toán, tài liệu sử dụng một cấu hình tiêu chuẩn trên đường phố Việt Nam:
+Khoảng cách liên kết: Ngã tư A cách Ngã tư B 500 mét (Nằm trong dải khoảng cách vàng 0-500m để đồng bộ Làn sóng xanh).
+Vận tốc trung bình (V): 50 km/h (tương đương ~13.8 m/s).
+Độ lệch pha (Offset): Khoảng thời gian đoàn xe chạy từ A đến B là 36 giây.
+Sự kiện kích hoạt (Trigger): Khi Ngã tư A bắt đầu bật đèn Xanh, AI tại A quét camera, nhận diện có một đoàn K xe đang thoát qua và lập tức gửi tín hiệu (request) sang Ngã tư B: "Có K xe sẽ đến B trong 36 giây nữa".
+Công thức bù trừ thất thoát (Hệ số tản mát động): Khi tính toán, Ngã tư B chỉ cộng thêm K/x số lượng xe. Tham số x là hệ số điều chỉnh linh hoạt được thiết lập dựa trên đặc thù địa hình của đoạn đường nối giữa A và B nhằm tránh lỗi đếm trùng và bù trừ lượng xe thất thoát. Cụ thể:
+Hệ số x
+Đặc thù đoạn đường (A -> B)
+Ý nghĩa tối ưu
+ 
+x = 1
+Đoạn đường thẳng xuyên suốt, không có ngã rẽ hoặc chỉ có hẻm rất nhỏ, ít phương tiện ra vào.
+Luồng xe được bảo toàn gần như 100%. Lượng xe từ A thoát ra sẽ đi thẳng trọn vẹn tới B.
+x = 2
+Đường rộng, thoáng, xe chạy với tốc độ cao (trên mức V trung bình) hoặc có một vài nhánh rẽ.
+Ngăn lỗi Đếm trùng: Xe chạy quá nhanh sẽ lọt vào khung hình Camera B sớm trước khi hết đèn đỏ. Chia 2 giúp trừ hao lượng xe này và số ít xe rẽ ngang.
+x = 3 hoặc 4
+Đoạn đường phức tạp, có nhiều ngã rẽ nhánh, chợ, siêu thị, trường học hoặc khu dân cư đông đúc.
+Bù trừ thất thoát lớn: Rất nhiều xe sẽ tấp lề hoặc rẽ đi hướng khác, lượng xe thực tế đến B sẽ giảm mạnh so với số lượng ban đầu đếm được tại A.
+3. Phân tích 3 Kịch bản Xử lý Logic tại Ngã tư B
+Khi Ngã tư B nhận được thông điệp từ A, AI tại B sẽ đánh giá trạng thái đèn hiện tại của chính nó để đưa ra 1 trong 3 kịch bản giải quyết sau:
+Kịch bản 1: B đang ĐỎ và Thời gian Đỏ còn lại (n) > 36s
+Thành phần
+Chi tiết Phân tích
+ 
+Thực trạng
+Nếu B tiếp tục chạy đếm ngược bình thường, 36s nữa khi đoàn xe từ A lao tới, đèn B vẫn đang hiển thị ĐỎ. Đoàn xe sẽ phải phanh gấp và dừng lại, phá vỡ Làn sóng xanh.
+Giải pháp (Solution)
+Ép pha / Rút ngắn pha (Force-off):
+B lập tức ép thời gian đèn Đỏ đếm ngược lùi về đúng 36s.
+*Cơ chế chống lỗi (Bảo vệ sinh mạng): Việc ép pha này phải thông qua hàm MAX(36s, Thời gian cần thiết để hướng ngang hoàn thành GT_MIN). Nếu hướng ngang chưa đủ thời gian an toàn tối thiểu (ví dụ 15s), hệ thống sẽ ưu tiên chạy đủ 15s an toàn rồi mới chuyển pha.
+Kết quả
+Đúng 36s sau, B chuyển XANH vừa khít lúc đón đoàn xe từ A tới. Ngay khoảnh khắc chuẩn bị chuyển Xanh, camera B quét số lượng xe đang đứng sẵn (N) cộng thêm phần dự báo (K/2) để đưa vào công thức tính ra số giây đèn Xanh tối ưu (GT_next).
+Sự đánh đổi (Trade-off)
+Hướng cắt ngang bị tước đoạt (cắt bớt) thời gian Xanh. Một số xe ở hướng ngang sẽ bị kẹt lại, nhưng sẽ được Camera YOLO ghi nhận lại đám đông này và "trả nợ" bù giờ bằng nhịp xanh tối đa (GT_MAX) ở chu kỳ ngay sau đó.
+Kịch bản 2: B đang ĐỎ và Thời gian Đỏ còn lại (n) < 36s
+Thành phần
+Chi tiết Phân tích
+ 
+Thực trạng
+B sẽ chuyển XANH quá sớm trước khi đoàn xe từ A đến. Lúc này đường B đang trống, camera B quét không thấy xe nên sẽ chỉ cấp một pha Xanh rất ngắn (ví dụ 15s) rồi vội chuyển lại về ĐỎ. Hậu quả: Khi đoàn xe từ A vừa đến nơi thì bị "ăn" quả đèn Đỏ.
+Giải pháp (Solution)
+Kéo dài pha (Hold Red / Early Return):
+AI tại B ra lệnh đình chỉ bộ đếm thời gian, buộc đèn Đỏ hiện tại phải "neo" thêm một khoảng thời gian là (36 - n) giây để đợi đoàn xe.
+Kết quả
+B trì hoãn việc bật Xanh. Đến đúng thời điểm 36s tính từ lúc nhận lệnh, B kích hoạt Camera, quét số xe thực tế, cộng thêm (K/2) rồi mới chính thức mở XANH để lùa trọn đoàn xe qua giao lộ.
+Sự đánh đổi (Trade-off)
+Các xe đang đứng chờ sẵn ở vạch dừng của trục chính tại B sẽ phải đợi Đỏ lâu hơn bình thường để "chờ đồng đội" từ A tới rồi mới được xuất phát. Đổi lại, tuyến ngang được hưởng lợi vì có thêm một khoảng xanh kéo dài.
+Kịch bản 3: B đang XANH (Lệch nhịp hoàn toàn)
+Thành phần
+Chi tiết Phân tích
+ 
+Thực trạng
+A báo 36s nữa có xe, nhưng B hiện tại đang XANH. Nếu B cứ giữ Xanh liên tục thêm 36s chờ xe tới, rồi lại tiếp tục Xanh thêm nhịp GT_next cho xe qua, tổng thời gian Xanh liên tục sẽ dài tới mức cực đoan (có thể lên tới 70-80s). Điều này sẽ bóp nghẹt tuyến cắt ngang.
+Giải pháp (Solution)
+Chèn pha ẩn (Phase Insertion):
+AI nhận ra 36 giây chờ đợi này thực chất là "thời gian chết" của trục chính. Nó lập tức ra lệnh: Chuyển trục chính sang ĐỎ. Dành toàn bộ 36 giây này mở XANH cho hướng cắt ngang xả xe.
+Đúng 36s sau, B ngắt tuyến ngang và chuyển lại màu XANH cho trục chính để kịp đón đoàn xe.
+Kết quả
+Triệt tiêu hoàn toàn thời gian chết. B tận dụng được khoảng trống 36s chờ đợi để giải cứu kẹt xe cho đường ngang. Làn sóng xanh trên trục chính vẫn được duy trì hoàn hảo khi xe từ A đáp tới.
+Sự đánh đổi (Trade-off)
+Những xe đang lưu thông lác đác trên trục chính tại B sẽ bị ngắt nhịp (gặp đèn Đỏ đột ngột) do hệ thống ưu tiên chèn pha để dọn đường cho đoàn xe đông hơn chuẩn bị đổ bộ từ A tới.
