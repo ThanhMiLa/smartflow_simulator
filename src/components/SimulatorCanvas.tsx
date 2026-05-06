@@ -5,6 +5,7 @@ export interface SimulatorRef {
   spawnTestPlatoon: (K: number) => void;
   getWaitingCarsA: () => number;
   getWaitingCarsB: () => number;
+  reset: () => void;
 }
 
 interface Props {
@@ -114,6 +115,11 @@ export const SimulatorCanvas = forwardRef<SimulatorRef, Props>(({ lightA, timerA
     getWaitingCarsB: () => {
       // Đếm xe chiều EW đang đứng chờ trước ngã tư B
       return carsRef.current.filter(c => c.axis === 'EW' && c.dir === 'right' && c.vel < 5 && c.x > cxB - stopLineOffset - 800 && c.x <= cxB - stopLineOffset).length;
+    },
+    reset: () => {
+      carsRef.current = [];
+      spawnAccRef.current = 0;
+      idGenRef.current = 0;
     }
   }));
 

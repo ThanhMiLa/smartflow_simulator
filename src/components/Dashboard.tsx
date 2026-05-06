@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Terminal as TerminalIcon, Settings, Play } from 'lucide-react';
+import { Terminal as TerminalIcon, Settings, Play, RotateCcw } from 'lucide-react';
 import type { LogEntry, LogType } from '../types';
 
 interface Props {
   logs: LogEntry[];
   onTestCase: (testCase: number, cars: number) => void;
+  onReset: () => void;
 }
 
-export const Dashboard: React.FC<Props> = ({ logs, onTestCase }) => {
+export const Dashboard: React.FC<Props> = ({ logs, onTestCase, onReset }) => {
   const [cars, setCars] = useState<number>(30);
 
   const getLogColor = (type: LogType) => {
@@ -45,6 +46,9 @@ export const Dashboard: React.FC<Props> = ({ logs, onTestCase }) => {
           </button>
           <button onClick={() => onTestCase(3, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold py-3.5 rounded-xl border border-rose-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-rose-900/20">
             <Play size={18} /> TEST KỊCH BẢN 3 (ĐANG XANH)
+          </button>
+          <button onClick={onReset} className="w-full bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold py-3.5 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-cyan-900/20 mt-2">
+            <RotateCcw size={18} /> LÀM MỚI (RESET)
           </button>
         </div>
       </div>

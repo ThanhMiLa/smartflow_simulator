@@ -58,6 +58,15 @@ export default function App() {
     }, 3200);
   };
 
+  const handleReset = () => {
+    addLog(`--- HỆ THỐNG ĐÃ ĐƯỢC RESET ---`, 'success');
+    if (simRef.current) {
+      simRef.current.reset();
+    }
+    nodeA.forceState('GREEN', 22);
+    nodeB.forceState('RED', 50);
+  };
+
   const openModal = (id: string) => {
     setActiveModal(id);
     document.body.style.overflow = 'hidden';
@@ -113,7 +122,7 @@ export default function App() {
               />
             </div>
 
-            <Dashboard logs={logs} onTestCase={handleTestCase} />
+            <Dashboard logs={logs} onTestCase={handleTestCase} onReset={handleReset} />
           </div>
         </div>
       </section>

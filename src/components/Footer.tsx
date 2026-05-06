@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, FileText, UserCircle, Users } from 'lucide-react';
+import { MapPin, Phone, Mail, FileText, UserCircle, Users, Zap } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -7,12 +7,14 @@ export function Footer() {
         <div className="flex flex-wrap gap-12 justify-between mb-16">
           {/* Brand Info */}
           <div className="flex-1 min-w-[300px]">
-            <a href="#" className="flex items-center gap-3 mb-6">
-              <img src="/image/logo.jpg" alt="Logo" className="h-10 rounded-md" />
+            <a href="#" className="flex items-center gap-3 mb-6 group">
+              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.4)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.8)] transition-all">
+                 <Zap className="text-white fill-white" size={20} />
+              </div>
               <span className="text-xl font-black text-white tracking-widest">SMARTFLOW</span>
             </a>
             <p className="text-slate-400 leading-relaxed mb-6">
-              Dự án đạt giải Khoa học Kỹ thuật cấp Trường (2025-2026).<br/>
+              Dự án đạt giải Khoa học Kỹ thuật cấp Tỉnh (2025-2026).<br/>
               Giải pháp tiên phong cho hạ tầng giao thông thông minh bền vững.<br/>
               Đã được các cơ quan chức năng cấp phép thử nghiệm tại nút giao Nguyễn Vịnh - Trần Hữu Khác, xã Quảng Điền, Tp Huế.
             </p>

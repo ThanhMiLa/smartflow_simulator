@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Zap } from 'lucide-react';
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -23,9 +23,8 @@ export function Header() {
     <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#030508]/90 backdrop-blur-xl border-b border-white/5 py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <a href="#" className="flex items-center gap-4 group">
-          <div className="relative">
-            <div className="absolute inset-0 bg-cyan-400 blur-md opacity-0 group-hover:opacity-50 transition-opacity"></div>
-            <img src="/image/logo.jpg" alt="CTech Logo" className="h-12 w-12 rounded-xl border border-white/10 relative z-10" />
+          <div className="relative flex items-center justify-center w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.5)] group-hover:shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all">
+             <Zap className="text-white fill-white" size={24} />
           </div>
           <div className="flex flex-col">
             <span className="text-2xl font-black tracking-wider text-white">SMART<span className="text-cyan-400">FLOW</span></span>
