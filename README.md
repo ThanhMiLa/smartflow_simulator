@@ -34,12 +34,35 @@ Repository này chứa mã nguồn phần **Front-end / Giao diện Web** của 
 
 ---
 
-## 🧠 Thuật toán lõi (Mô phỏng)
-Hệ thống dựa trên dữ liệu từ Camera AI (YOLO) để điều khiển thời gian đèn xanh:
-- **Ngưỡng xe ($N_{MAX}$):** 25 xe.
-- **Thời gian xanh tối thiểu ($GT_{min}$):** 15 giây.
-- **Thời gian xanh tối đa ($GT_{MAX}$):** 50 giây.
-- **Hiệu quả thực tế:** Giảm thời gian chờ trung bình từ **31.6% đến 34%**.
+# 🧠 Thuật toán điều khiển thông minh (Core Algorithm)
+
+Hệ thống kế thừa tư tưởng từ mô hình **RHODES** (Real-time Hierarchical Optimized Distributed Effective System) kết hợp với **sơ đồ phân pha 2 vòng NEMA**, giúp tối ưu hóa dòng giao thông thời gian thực và đảm bảo không xảy ra xung đột giữa các hướng rẽ.
+
+## 📈 Công thức tính toán thời gian đèn xanh ($GT_{next}$)
+
+Hệ thống sử dụng công thức nội suy tuyến tính có chặn và làm trơn để quyết định thời lượng đèn xanh dựa trên mật độ xe thực tế:
+
+$$GT_{next} = GT_{MIN} + \frac{N - N_{MIN}}{N_{MAX} - N_{MIN}} \times (GT_{MAX} - GT_{MIN})$$
+
+### 🔍 Giải thích các tham số:
+* **$N$**: Số lượng xe thực tế do Camera AI (YOLO) đếm được tại thời điểm quan sát.
+* **$N_{MIN} = 5$ (xe)**: Ngưỡng tối thiểu. Nếu số xe $\le 5$, hệ thống coi như đường vắng để tránh lãng phí thời gian xanh.
+* **$N_{MAX} = 50$ (xe)**: Ngưỡng tối đa (tính toán dựa trên chiều dài làn chờ và khoảng cách xe). Nếu $\ge 50$ xe, hệ thống coi như đang kẹt xe nặng.
+* **$GT_{MIN} = 15s$**: Thời gian xanh tối thiểu, đảm bảo an toàn cho đoàn xe kịp khởi động và băng qua giao lộ.
+* **$GT_{MAX} = 50s$**: Thời gian xanh tối đa, nhằm giới hạn thời gian chờ cho các hướng đối diện, tránh gây ùn tắc dây chuyền.
+
+## ⚖️ Cơ chế xử lý trường hợp biên (Clamping Logic)
+
+Để đảm bảo hệ thống vận hành ổn định và không đưa ra các giá trị phi lý, thuật toán áp dụng logic chặn như sau:
+
+1.  **Trường hợp đường vắng ($N \le N_{MIN}$):** * Mặc định $GT_{next} = 15s$.
+2.  **Trường hợp quá tải ($N \ge N_{MAX}$):** * Mặc định $GT_{next} = 50s$.
+3.  **Trường hợp lưu lượng bình thường ($N_{MIN} < N < N_{MAX}$):** * Tính toán linh hoạt theo công thức nội suy để đưa ra thời gian xanh tối ưu nhất.
+
+## 📊 Hiệu quả thực tế
+Dựa trên các dữ liệu mô phỏng và thực nghiệm tại nút giao:
+* **Giảm thời gian chờ trung bình:** từ **31.6% đến 34%**.
+* Tối ưu hóa khả năng thông hành, giảm thiểu tình trạng "đèn xanh cho đường trống".
 
 ---
 
