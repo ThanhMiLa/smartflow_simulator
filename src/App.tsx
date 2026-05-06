@@ -3,6 +3,13 @@ import { Zap } from 'lucide-react';
 import { useTrafficLogic } from './hooks/useTrafficLogic';
 import { SimulatorCanvas, type SimulatorRef } from './components/SimulatorCanvas';
 import { Dashboard } from './components/Dashboard';
+import { Header } from './components/Header';
+import { Hero } from './components/Hero';
+import { CoreTech } from './components/CoreTech';
+import { Features } from './components/Features';
+import { VideoDemo } from './components/VideoDemo';
+import { Footer } from './components/Footer';
+import { Modals } from './components/Modals';
 import type { LogEntry, LogType, SystemConfig } from './types';
 
 const OFFSET = 36;
@@ -10,6 +17,7 @@ const OFFSET = 36;
 export default function App() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [config, setConfig] = useState<SystemConfig>({ x: 2, distance: 500, speed: 50 });
+  const [activeModal, setActiveModal] = useState<string | null>(null);
   const simRef = useRef<SimulatorRef>(null);
 
   const addLog = useCallback((msg: string, type: LogType = 'info') => {
@@ -50,36 +58,68 @@ export default function App() {
     }, 3200);
   };
 
+  const openModal = (id: string) => {
+    setActiveModal(id);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
+    document.body.style.overflow = 'auto';
+  };
+
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-6 font-sans">
-      <div className="max-w-7xl mx-auto">
-        <header className="flex justify-between items-center bg-white/5 p-5 rounded-2xl border border-white/10 mb-8 shadow-lg shadow-black/20">
-           <h1 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center gap-3">
-             <Zap className="text-cyan-400" /> SMARTFLOW SIMULATOR
-           </h1>
-           <div className="flex items-center gap-6 text-xs font-bold uppercase text-slate-400">
-             <div className="flex flex-col items-end">
-                <span>Hệ số giảm trừ: x = {config.x}</span>
-                <input 
-                  type="range" min="1" max="4" value={config.x} 
-                  onChange={(e) => setConfig({...config, x: Number(e.target.value)})}
-                  className="w-32 mt-1 accent-cyan-500" 
-                />
-             </div>
-             <span className="text-emerald-400 text-base bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">Offset: {OFFSET}s</span>
-           </div>
-        </header>
+    <div className="bg-[#030508] text-white font-sans overflow-x-hidden selection:bg-cyan-400/30 selection:text-cyan-400">
+      <Header />
+      <Hero />
+      <CoreTech onOpenModal={openModal} />
+      <Features onOpenModal={openModal} />
+      <VideoDemo />
 
-        <div className="mb-8">
-          <SimulatorCanvas 
-            ref={simRef}
-            lightA={nodeA.light} timerA={nodeA.timer}
-            lightB={nodeB.light} timerB={nodeB.timer}
-          />
+      <section id="simulator" className="py-24 border-t border-white/5 relative">
+        {/* Background gradient for simulator section */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#132b63_0%,transparent_50%)] opacity-30 pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <span className="text-cyan-400 text-sm tracking-[0.2em] uppercase font-bold">LIVE DEMO</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Mô Phỏng Giao Lộ Thông Minh</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto text-lg">Phiên bản mô phỏng đa làn tích hợp trực tiếp vào website SmartFlow, giữ nguyên trải nghiệm và phong cách giao diện.</p>
+          </div>
+
+          <div className="bg-[#0b101a] p-6 md:p-8 rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <header className="flex justify-between items-center bg-white/5 p-5 rounded-2xl border border-white/10 mb-8 shadow-lg shadow-black/20">
+               <h1 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center gap-3">
+                 <Zap className="text-cyan-400" /> SMARTFLOW SIMULATOR
+               </h1>
+               <div className="flex items-center gap-6 text-xs font-bold uppercase text-slate-400">
+                 <div className="flex flex-col items-end">
+                    <span>Hệ số giảm trừ: x = {config.x}</span>
+                    <input 
+                      type="range" min="1" max="4" value={config.x} 
+                      onChange={(e) => setConfig({...config, x: Number(e.target.value)})}
+                      className="w-32 mt-1 accent-cyan-500" 
+                    />
+                 </div>
+                 <span className="text-emerald-400 text-base bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">Offset: {OFFSET}s</span>
+               </div>
+            </header>
+
+            <div className="mb-8">
+              <SimulatorCanvas 
+                ref={simRef}
+                lightA={nodeA.light} timerA={nodeA.timer}
+                lightB={nodeB.light} timerB={nodeB.timer}
+              />
+            </div>
+
+            <Dashboard logs={logs} onTestCase={handleTestCase} />
+          </div>
         </div>
+      </section>
 
-        <Dashboard logs={logs} onTestCase={handleTestCase} />
-      </div>
+      <Footer />
+      <Modals activeModal={activeModal} onClose={closeModal} />
     </div>
   );
 }
