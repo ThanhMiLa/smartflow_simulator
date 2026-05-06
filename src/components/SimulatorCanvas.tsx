@@ -30,6 +30,8 @@ interface Car {
   passedA?: boolean;
   passedB?: boolean;
   _dead: boolean;
+  turnDecision?: 'straight' | 'right';
+  turnTarget?: 'A' | 'B';
 }
 
 const W = 1200;
@@ -106,12 +108,12 @@ export const SimulatorCanvas = forwardRef<SimulatorRef, Props>(({ lightA, timerA
       carsRef.current.push(...newCars);
     },
     getWaitingCarsA: () => {
-      // Đếm xe chiều EW đang đứng chờ trước ngã tư A
-      return carsRef.current.filter(c => c.axis === 'EW' && c.dir === 'right' && c.vel < 2 && c.x > cxA - stopLineOffset - 150 && c.x <= cxA - stopLineOffset).length;
+      // Đếm xe chiều EW đang đứng chờ trước ngã tư A (khoảng cách check 800px)
+      return carsRef.current.filter(c => c.axis === 'EW' && c.dir === 'right' && c.vel < 5 && c.x > cxA - stopLineOffset - 800 && c.x <= cxA - stopLineOffset).length;
     },
     getWaitingCarsB: () => {
       // Đếm xe chiều EW đang đứng chờ trước ngã tư B
-      return carsRef.current.filter(c => c.axis === 'EW' && c.dir === 'right' && c.vel < 2 && c.x > cxB - stopLineOffset - 150 && c.x <= cxB - stopLineOffset).length;
+      return carsRef.current.filter(c => c.axis === 'EW' && c.dir === 'right' && c.vel < 5 && c.x > cxB - stopLineOffset - 800 && c.x <= cxB - stopLineOffset).length;
     }
   }));
 
@@ -151,23 +153,38 @@ export const SimulatorCanvas = forwardRef<SimulatorRef, Props>(({ lightA, timerA
       const speed = BASE_SPEED * (0.8 + Math.random() * 0.4);
       const color = colorsCars[(idGenRef.current++) % colorsCars.length];
 
-      let car: Partial<Car> = { id: idGenRef.current, speed, vel: speed, maxAccel: 60, color, _dead: false, passedA: false, passedB: false };
+      let turnDecision: 'straight' | 'right' = 'straight';
+
+      if (laneIndex === 1 && Math.random() < 0.3) {
+         turnDecision = 'right';
+      }
+
+      let car: Partial<Car> = { id: idGenRef.current, speed, vel: speed, maxAccel: 60, color, _dead: false, passedA: false, passedB: false, turnDecision };
       
-      if (r < 0.2) { // NS_A down
+      if (r < 0.16) { // NS_A down
         car.axis = 'NS_A'; car.dir = 'down'; car.laneKey = `NSA_down_${laneIndex}`;
         car.w = 12; car.h = 24; car.x = cxA - (laneW / 2 + laneGap / 2) - (laneW + laneGap) * (lanesPerDir - 1) / 2 + offset; car.y = -50;
-      } else if (r < 0.4) { // NS_A up
+        if (turnDecision === 'right') car.turnTarget = 'A';
+      } else if (r < 0.32) { // NS_A up
         car.axis = 'NS_A'; car.dir = 'up'; car.laneKey = `NSA_up_${laneIndex}`;
         car.w = 12; car.h = 24; car.x = cxA + (laneW / 2 + laneGap / 2) + (laneW + laneGap) * (lanesPerDir - 1) / 2 + offset; car.y = H + 50;
-      } else if (r < 0.6) { // NS_B down
+        if (turnDecision === 'right') car.turnTarget = 'A';
+      } else if (r < 0.48) { // NS_B down
         car.axis = 'NS_B'; car.dir = 'down'; car.laneKey = `NSB_down_${laneIndex}`;
         car.w = 12; car.h = 24; car.x = cxB - (laneW / 2 + laneGap / 2) - (laneW + laneGap) * (lanesPerDir - 1) / 2 + offset; car.y = -50;
-      } else if (r < 0.8) { // NS_B up
+        if (turnDecision === 'right') car.turnTarget = 'B';
+      } else if (r < 0.64) { // NS_B up
         car.axis = 'NS_B'; car.dir = 'up'; car.laneKey = `NSB_up_${laneIndex}`;
         car.w = 12; car.h = 24; car.x = cxB + (laneW / 2 + laneGap / 2) + (laneW + laneGap) * (lanesPerDir - 1) / 2 + offset; car.y = H + 50;
-      } else { // EW left
+        if (turnDecision === 'right') car.turnTarget = 'B';
+      } else if (r < 0.82) { // EW left
         car.axis = 'EW'; car.dir = 'left'; car.laneKey = `EW_left_${laneIndex}`;
         car.w = 24; car.h = 12; car.x = W + 50; car.y = cy - (laneW / 2 + laneGap / 2) - (laneW + laneGap) * (lanesPerDir - 1) / 2 + offset;
+        if (turnDecision === 'right') car.turnTarget = Math.random() < 0.5 ? 'A' : 'B';
+      } else { // EW right
+        car.axis = 'EW'; car.dir = 'right'; car.laneKey = `EW_right_${laneIndex}`;
+        car.w = 24; car.h = 12; car.x = -50; car.y = cy + (laneW / 2 + laneGap / 2) + (laneW + laneGap) * (lanesPerDir - 1) / 2 + offset;
+        if (turnDecision === 'right') car.turnTarget = Math.random() < 0.5 ? 'A' : 'B';
       }
       
       carsRef.current.push(car as Car);
@@ -245,6 +262,20 @@ export const SimulatorCanvas = forwardRef<SimulatorRef, Props>(({ lightA, timerA
         if (c.dir === 'up') c.y = Math.max(c.y, targetStop + stopPad + c.h/2);
       }
 
+      // Check Turn
+      if (c.turnDecision === 'right' && c.turnTarget) {
+         const cxTarget = c.turnTarget === 'B' ? cxB : cxA;
+         if (c.dir === 'right' && c.x >= cxTarget - 24) {
+            c.dir = 'down'; c.axis = c.turnTarget === 'B' ? 'NS_B' : 'NS_A'; c.x = cxTarget - 24; c.w = 12; c.h = 24; c.turnDecision = 'straight';
+         } else if (c.dir === 'left' && c.x <= cxTarget + 24) {
+            c.dir = 'up'; c.axis = c.turnTarget === 'B' ? 'NS_B' : 'NS_A'; c.x = cxTarget + 24; c.w = 12; c.h = 24; c.turnDecision = 'straight';
+         } else if (c.dir === 'down' && c.y >= cy - 24) {
+            c.dir = 'left'; c.axis = 'EW'; c.y = cy - 24; c.w = 24; c.h = 12; c.turnDecision = 'straight'; c.passedA = (cxTarget === cxA); c.passedB = (cxTarget === cxB);
+         } else if (c.dir === 'up' && c.y <= cy + 24) {
+            c.dir = 'right'; c.axis = 'EW'; c.y = cy + 24; c.w = 24; c.h = 12; c.turnDecision = 'straight'; c.passedA = (cxTarget === cxA); c.passedB = (cxTarget === cxB);
+         }
+      }
+
       // Check xe phía trước
       let spacingStop = false;
       const ahead = findCarAhead(c);
@@ -300,12 +331,17 @@ export const SimulatorCanvas = forwardRef<SimulatorRef, Props>(({ lightA, timerA
 
     // Draw Roads
     ctx.fillStyle = '#171f2e';
-    // EW Road
-    ctx.fillRect(0, cy - crossHalf, W, roadW);
     // NS A Road
     ctx.fillRect(cxA - crossHalf, 0, roadW, H);
     // NS B Road
     ctx.fillRect(cxB - crossHalf, 0, roadW, H);
+
+    // EW Road Highlight
+    ctx.fillStyle = '#1c283d';
+    ctx.shadowColor = 'rgba(77, 215, 255, 0.4)';
+    ctx.shadowBlur = 20;
+    ctx.fillRect(0, cy - crossHalf, W, roadW);
+    ctx.shadowBlur = 0;
 
     // Draw Lanes
     ctx.fillStyle = '#27314a';
