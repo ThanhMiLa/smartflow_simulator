@@ -36,10 +36,10 @@ interface Car {
 }
 
 const W = 1200;
-const H = 600;
+const H = 420;
 const cxA = 300;
 const cxB = 900;
-const cy = 300;
+const cy = 210;
 const OFFSET = 36; // seconds
 const DISTANCE = cxB - cxA;
 const BASE_SPEED = DISTANCE / OFFSET; // px/s (~16.6)
