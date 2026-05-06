@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hiệu ứng trôi mượt cho xe */
+.car-transition {
+  transition: left 1s linear;
+}
+
+/* Custom scrollbar cho ngầu */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a; 
+}
+::-webkit-scrollbar-thumb {
+  background: #3b82f6; 
+  border-radius: 4px;
+}
