@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, FileText, UserCircle, Users, Zap } from 'lucide-react';
+import { MapPin, Phone, Mail, FileText, UserCircle, Users } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -8,8 +8,8 @@ export function Footer() {
           {/* Brand Info */}
           <div className="flex-1 min-w-[300px]">
             <a href="#" className="flex items-center gap-3 mb-6 group">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.4)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.8)] transition-all">
-                 <Zap className="text-white fill-white" size={20} />
+              <div className="w-10 h-10 bg-white rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.3)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] transition-all overflow-hidden border border-white/10">
+                 <img src="/image/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
               </div>
               <span className="text-xl font-black text-white tracking-widest">SMARTFLOW</span>
             </a>

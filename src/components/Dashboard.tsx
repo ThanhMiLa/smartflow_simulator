@@ -21,8 +21,8 @@ export const Dashboard: React.FC<Props> = ({ logs, onTestCase, onReset }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[400px]">
-      <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 flex flex-col">
+    <div className="flex flex-col gap-6 h-full">
+      <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 flex flex-col shrink-0 shadow-lg shadow-black/20">
         <h3 className="text-xs font-bold text-slate-300 mb-4 flex items-center gap-2 uppercase tracking-wider">
           <Settings size={16} className="text-cyan-400" /> Cài đặt Kịch bản Test
         </h3>
@@ -39,13 +39,13 @@ export const Dashboard: React.FC<Props> = ({ logs, onTestCase, onReset }) => {
 
         <div className="flex-1 flex flex-col gap-3">
           <button onClick={() => onTestCase(1, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold py-3.5 rounded-xl border border-emerald-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-emerald-900/20">
-            <Play size={18} /> TEST KỊCH BẢN 1 (ĐỎ &gt; 36s)
+            <Play size={18} /> KỊCH BẢN 1 (ĐỎ &gt; 36s)
           </button>
           <button onClick={() => onTestCase(2, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold py-3.5 rounded-xl border border-amber-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-amber-900/20">
-            <Play size={18} /> TEST KỊCH BẢN 2 (ĐỎ &lt; 36s)
+            <Play size={18} /> KỊCH BẢN 2 (ĐỎ &lt; 36s)
           </button>
           <button onClick={() => onTestCase(3, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold py-3.5 rounded-xl border border-rose-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-rose-900/20">
-            <Play size={18} /> TEST KỊCH BẢN 3 (ĐANG XANH)
+            <Play size={18} /> KỊCH BẢN 3 (ĐANG XANH)
           </button>
           <button onClick={onReset} className="w-full bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold py-3.5 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-cyan-900/20 mt-2">
             <RotateCcw size={18} /> LÀM MỚI (RESET)
@@ -53,7 +53,7 @@ export const Dashboard: React.FC<Props> = ({ logs, onTestCase, onReset }) => {
         </div>
       </div>
 
-      <div className="lg:col-span-2 bg-[#0a0a0a] rounded-2xl p-5 border border-white/10 flex flex-col relative overflow-hidden">
+      <div className="flex-1 bg-[#0a0a0a] rounded-2xl p-5 border border-white/10 flex flex-col relative overflow-hidden min-h-[300px]">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-30" />
         <div className="sticky top-0 bg-[#0a0a0a] pb-3 mb-2 border-b border-white/10 flex items-center gap-2 text-slate-400 text-[10px] font-bold tracking-widest z-10 shrink-0">
           <TerminalIcon size={14} className="text-cyan-400" /> SYSTEM REAL-TIME LOGIC (TERMINAL)

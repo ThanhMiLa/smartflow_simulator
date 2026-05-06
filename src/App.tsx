@@ -96,33 +96,46 @@ export default function App() {
             <p className="text-slate-400 max-w-2xl mx-auto text-lg">Phiên bản mô phỏng đa làn tích hợp trực tiếp vào website SmartFlow, giữ nguyên trải nghiệm và phong cách giao diện.</p>
           </div>
 
-          <div className="bg-[#0b101a] p-6 md:p-8 rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-            <header className="flex justify-between items-center bg-white/5 p-5 rounded-2xl border border-white/10 mb-8 shadow-lg shadow-black/20">
-               <h1 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center gap-3">
-                 <Zap className="text-cyan-400" /> SMARTFLOW SIMULATOR
-               </h1>
-               <div className="flex items-center gap-6 text-xs font-bold uppercase text-slate-400">
-                 <div className="flex flex-col items-end">
-                    <span>Hệ số giảm trừ: x = {config.x}</span>
-                    <input 
-                      type="range" min="1" max="4" value={config.x} 
-                      onChange={(e) => setConfig({...config, x: Number(e.target.value)})}
-                      className="w-32 mt-1 accent-cyan-500" 
-                    />
+          <div className="bg-[#0b101a] p-6 md:p-8 rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col xl:flex-row gap-8">
+            {/* Sidebar Controls */}
+            <div className="w-full xl:w-[380px] shrink-0 flex flex-col gap-6">
+              <header className="flex flex-col gap-4 bg-white/5 p-6 rounded-2xl border border-white/10 shadow-lg shadow-black/20">
+                 <h1 className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center gap-2">
+                   <Zap className="text-cyan-400" size={20} /> SMARTFLOW SIM
+                 </h1>
+                 
+                 <div className="flex flex-col gap-4 mt-2">
+                   <div className="flex justify-between items-center bg-slate-900/50 p-3 rounded-xl border border-white/5">
+                      <span className="text-xs font-bold text-slate-400 uppercase">Hệ số giảm trừ (x)</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-cyan-400 font-mono font-bold text-sm">{config.x}</span>
+                        <input 
+                          type="range" min="1" max="4" value={config.x} 
+                          onChange={(e) => setConfig({...config, x: Number(e.target.value)})}
+                          className="w-24 accent-cyan-500" 
+                        />
+                      </div>
+                   </div>
+                   
+                   <div className="flex justify-between items-center bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">
+                     <span className="text-xs font-bold text-emerald-400 uppercase">Offset dự báo</span>
+                     <span className="text-emerald-400 font-mono font-bold">{OFFSET}s</span>
+                   </div>
                  </div>
-                 <span className="text-emerald-400 text-base bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">Offset: {OFFSET}s</span>
-               </div>
-            </header>
+              </header>
 
-            <div className="mb-8">
+              <Dashboard logs={logs} onTestCase={handleTestCase} onReset={handleReset} />
+            </div>
+
+            {/* Main Simulator Canvas */}
+            <div className="flex-1 min-w-0 bg-black/40 p-2 md:p-6 rounded-2xl border border-white/5 flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
               <SimulatorCanvas 
                 ref={simRef}
                 lightA={nodeA.light} timerA={nodeA.timer}
                 lightB={nodeB.light} timerB={nodeB.timer}
               />
             </div>
-
-            <Dashboard logs={logs} onTestCase={handleTestCase} onReset={handleReset} />
           </div>
         </div>
       </section>
