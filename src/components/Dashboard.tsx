@@ -21,8 +21,8 @@ export const Dashboard: React.FC<Props> = ({ logs, onTestCase, onReset }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[400px]">
-      <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 flex flex-col shadow-lg shadow-black/20 overflow-hidden h-full">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:h-[400px]">
+      <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 flex flex-col shadow-lg shadow-black/20 overflow-hidden lg:h-full">
         <h3 className="text-xs font-bold text-slate-300 mb-3 flex items-center gap-2 uppercase tracking-wider shrink-0">
           <Settings size={16} className="text-cyan-400" /> Cài đặt Kịch bản Test
         </h3>
@@ -47,13 +47,13 @@ export const Dashboard: React.FC<Props> = ({ logs, onTestCase, onReset }) => {
           <button onClick={() => onTestCase(3, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold py-3 rounded-xl border border-rose-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-rose-900/20">
             <Play size={18} /> KỊCH BẢN 3 (ĐANG XANH)
           </button>
-          <button onClick={onReset} className="w-full bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold py-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-cyan-900/20 mt-auto">
+          <button onClick={onReset} className="w-full bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold py-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-cyan-900/20 mt-2 lg:mt-auto">
             <RotateCcw size={18} /> LÀM MỚI (RESET)
           </button>
         </div>
       </div>
 
-      <div className="lg:col-span-2 bg-[#0a0a0a] rounded-2xl p-5 border border-white/10 flex flex-col relative overflow-hidden h-full">
+      <div className="lg:col-span-2 bg-[#0a0a0a] rounded-2xl p-5 border border-white/10 flex flex-col relative overflow-hidden h-[300px] lg:h-full">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-30" />
         <div className="sticky top-0 bg-[#0a0a0a] pb-3 mb-2 border-b border-white/10 flex items-center gap-2 text-slate-400 text-[10px] font-bold tracking-widest z-10 shrink-0">
           <TerminalIcon size={14} className="text-cyan-400" /> SYSTEM REAL-TIME LOGIC (TERMINAL)

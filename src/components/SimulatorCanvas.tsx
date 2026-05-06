@@ -36,10 +36,10 @@ interface Car {
 }
 
 const W = 1200;
-const H = 420;
+const H = 540;
 const cxA = 300;
 const cxB = 900;
-const cy = 210;
+const cy = 270;
 const OFFSET = 36; // seconds
 const DISTANCE = cxB - cxA;
 const BASE_SPEED = DISTANCE / OFFSET; // px/s (~16.6)
@@ -57,6 +57,7 @@ const colorsCars = ['#79a8ff','#ff8b94','#7fffd4','#ffd36a','#c084fc','#a3e635',
 
 export const SimulatorCanvas = forwardRef<SimulatorRef, Props>(({ lightA, timerA, lightB, timerB }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRefMobile = useRef<HTMLCanvasElement>(null);
   const carsRef = useRef<Car[]>([]);
   const idGenRef = useRef(0);
   const spawnAccRef = useRef(0);
@@ -124,11 +125,6 @@ export const SimulatorCanvas = forwardRef<SimulatorRef, Props>(({ lightA, timerA
   }));
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
     let lastT = performance.now();
     let animFrameId: number;
 
@@ -137,7 +133,12 @@ export const SimulatorCanvas = forwardRef<SimulatorRef, Props>(({ lightA, timerA
       lastT = t;
 
       updatePhysics(dt);
-      draw(ctx);
+
+      const ctx1 = canvasRef.current?.getContext('2d');
+      if (ctx1) draw(ctx1);
+
+      const ctx2 = canvasRefMobile.current?.getContext('2d');
+      if (ctx2) draw(ctx2);
 
       animFrameId = requestAnimationFrame(loop);
     };
@@ -451,8 +452,26 @@ export const SimulatorCanvas = forwardRef<SimulatorRef, Props>(({ lightA, timerA
   };
 
   return (
-    <div className="w-full flex justify-center bg-[#05070a] rounded-2xl border border-slate-800 shadow-2xl overflow-hidden p-4">
-      <canvas ref={canvasRef} width={W} height={H} className="max-w-full h-auto bg-black rounded-xl" />
+    <div className="w-full flex flex-col justify-center bg-[#05070a] md:rounded-2xl border-y md:border border-slate-800 shadow-2xl overflow-hidden p-0 md:p-4">
+      {/* Mobile rotated view (Vertical Layout) */}
+      <div className="block md:hidden relative w-full bg-[#05070a] overflow-hidden" style={{ aspectRatio: `${H} / ${W}` }}>
+         <canvas 
+           ref={canvasRefMobile}
+           width={W} 
+           height={H} 
+           className="absolute top-1/2 left-1/2 origin-center bg-black"
+           style={{
+             width: `${(W / H) * 100}%`,
+             height: `${(H / W) * 100}%`,
+             transform: 'translate(-50%, -50%) rotate(90deg)',
+           }}
+         />
+      </div>
+
+      {/* Desktop normal view (Horizontal Layout) */}
+      <div className="hidden md:block w-full">
+        <canvas ref={canvasRef} width={W} height={H} className="max-w-full h-auto bg-black rounded-xl mx-auto block" />
+      </div>
     </div>
   );
 });

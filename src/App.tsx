@@ -96,29 +96,28 @@ export default function App() {
             <p className="text-slate-400 max-w-2xl mx-auto text-lg">Phiên bản mô phỏng đa làn tích hợp trực tiếp vào website SmartFlow, giữ nguyên trải nghiệm và phong cách giao diện.</p>
           </div>
 
-          <div className="bg-[#0b101a] p-6 md:p-8 rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-            <header className="flex flex-col md:flex-row justify-between items-center bg-white/5 p-5 rounded-2xl border border-white/10 mb-8 shadow-lg shadow-black/20 gap-4">
-               <h1 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center gap-3">
-                 <Zap className="text-cyan-400" /> SMARTFLOW SIMULATOR
+          <div className="bg-[#0b101a] p-3 md:p-8 rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <header className="flex flex-col md:flex-row justify-between items-center bg-white/5 p-4 md:p-5 rounded-2xl border border-white/10 mb-6 md:mb-8 shadow-lg shadow-black/20 gap-4">
+               <h1 className="text-xl md:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center gap-2 md:gap-3 text-center">
+                 <Zap className="text-cyan-400 shrink-0" size={24} /> SMARTFLOW SIM
                </h1>
-               <div className="flex items-center gap-6 text-xs font-bold uppercase text-slate-400">
-                 <div className="flex flex-col items-end">
+               <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 text-xs font-bold uppercase text-slate-400">
+                 <div className="flex items-center gap-3 md:flex-col md:items-end">
                     <span>Hệ số giảm trừ: x = {config.x}</span>
                     <input 
                       type="range" min="1" max="4" value={config.x} 
                       onChange={(e) => setConfig({...config, x: Number(e.target.value)})}
-                      className="w-32 mt-1 accent-cyan-500" 
+                      className="w-24 md:w-32 accent-cyan-500" 
                     />
                  </div>
-                 <span className="text-emerald-400 text-base bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">Offset: {OFFSET}s</span>
+                 <span className="text-emerald-400 text-sm md:text-base bg-emerald-500/10 px-3 py-1.5 md:px-4 md:py-2 rounded-xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">Offset: {OFFSET}s</span>
                </div>
             </header>
 
-            <div className="mb-8 bg-black/40 p-2 md:p-6 rounded-2xl border border-white/5 flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
+            <div className="mb-6 md:mb-8 bg-black/40 p-1 md:p-6 rounded-2xl border-0 md:border border-white/5 flex items-center justify-center relative overflow-hidden">
+              <div className="hidden md:block absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
               
-              {/* Giới hạn độ rộng để canvas không bị quá to */}
-              <div className="w-full max-w-[1000px] relative z-10">
+              <div className="w-full max-w-[1000px] relative z-10 mx-auto">
                 <SimulatorCanvas 
                   ref={simRef}
                   lightA={nodeA.light} timerA={nodeA.timer}
