@@ -26,11 +26,11 @@ export const Dashboard: React.FC<Props> = ({ logs, onTestCase, onReset }) => {
         <h3 className="text-xs font-bold text-slate-300 mb-3 flex items-center gap-2 uppercase tracking-wider shrink-0">
           <Settings size={16} className="text-cyan-400" /> Cài đặt Kịch bản Test
         </h3>
-        
+
         <div className="mb-4 shrink-0">
           <label className="text-xs text-slate-400 mb-2 block uppercase font-bold">Số lượng xe dự kiến (K)</label>
-          <input 
-            type="number" 
+          <input
+            type="number"
             value={cars}
             onChange={(e) => setCars(Number(e.target.value) || 0)}
             className="w-full bg-slate-800/80 border border-slate-600 rounded-lg p-2.5 text-white font-mono text-lg text-center outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all shadow-inner"
@@ -39,15 +39,13 @@ export const Dashboard: React.FC<Props> = ({ logs, onTestCase, onReset }) => {
 
         <div className="flex-1 flex flex-col gap-2.5">
           <button onClick={() => onTestCase(1, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold py-3 rounded-xl border border-emerald-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-emerald-900/20">
-            <Play size={18} /> KỊCH BẢN 1 (ĐỎ &gt; 36s)
+            <Play size={18} /> KỊCH BẢN 1 (Nút giao B: ĐỎ &gt; 25s)
           </button>
           <button onClick={() => onTestCase(2, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold py-3 rounded-xl border border-amber-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-amber-900/20">
-            <Play size={18} /> KỊCH BẢN 2 (ĐỎ &lt; 36s)
+            <Play size={18} /> KỊCH BẢN 2 (Nút giao B: ĐỎ &lt; 25s)
           </button>
-          <button onClick={() => onTestCase(3, cars)} className="w-full bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold py-3 rounded-xl border border-rose-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-rose-900/20">
-            <Play size={18} /> KỊCH BẢN 3 (ĐANG XANH)
-          </button>
-          <button onClick={onReset} className="w-full bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold py-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-cyan-900/20 mt-2 lg:mt-auto">
+
+          <button onClick={onReset} className="w-full bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold py-3 rounded-xl border border-cyan-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-cyan-900/20">
             <RotateCcw size={18} /> LÀM MỚI (RESET)
           </button>
         </div>

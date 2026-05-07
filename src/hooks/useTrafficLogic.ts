@@ -6,7 +6,8 @@ export const useTrafficLogic = (
   initialTimer: number, 
   name: string, 
   addLog: (msg: string, type: LogType) => void,
-  getWaitingCars: () => number
+  getWaitingCars: () => number,
+  isPaused: boolean
 ) => {
   const [light, setLight] = useState<LightState>(initialLight);
   const [timer, setTimer] = useState<number>(initialTimer);
@@ -26,35 +27,36 @@ export const useTrafficLogic = (
 
   // Vòng lặp đếm ngược cơ bản
   useEffect(() => {
-    const ticker = setInterval(() => {
-      setTimer((t) => {
-        if (t <= 1) {
-          if (light === 'GREEN') {
-            setLight('YELLOW');
-            return 3;
-          } else if (light === 'YELLOW') {
-            setLight('RED');
-            return 36;
-          } else {
-            // Chuyển sang XANH: Áp dụng công thức GTnext
-            const nWait = getWaitingCars();
-            const nPred = predictedCarsRef.current;
-            predictedCarsRef.current = 0; // Reset
-            const nTotal = nWait + nPred;
-            
-            const gtNext = calculateGT(nTotal);
-            
-            addLog(`[${name}] Đèn XANH. Thực tế: ${nWait} xe chờ, Dự báo: ${nPred} xe. Áp dụng công thức GTnext = ${gtNext}s`, 'success');
-            
-            setLight('GREEN');
-            return gtNext;
-          }
+    if (isPaused) return;
+
+    const ticker = setTimeout(() => {
+      if (timer <= 1) {
+        if (light === 'GREEN') {
+          setLight('YELLOW');
+          setTimer(3);
+        } else if (light === 'YELLOW') {
+          setLight('RED');
+          setTimer(25);
+        } else {
+          // Chuyển sang XANH: Áp dụng công thức GTnext
+          const nWait = getWaitingCars();
+          const nPred = predictedCarsRef.current;
+          predictedCarsRef.current = 0; // Reset
+          const nTotal = nWait + nPred;
+          
+          const gtNext = calculateGT(nTotal);
+          
+          addLog(`[${name}] Đèn XANH. Thực tế: ${nWait} xe chờ, Dự báo: ${nPred} xe. Áp dụng công thức GTnext = ${gtNext}s`, 'success');
+          
+          setLight('GREEN');
+          setTimer(gtNext);
         }
-        return t - 1;
-      });
+      } else {
+        setTimer(t => t - 1);
+      }
     }, 1000);
-    return () => clearInterval(ticker);
-  }, [light, getWaitingCars, name, addLog]);
+    return () => clearTimeout(ticker);
+  }, [light, timer, getWaitingCars, name, addLog, isPaused]);
 
   // Hàm xử lý Request Làn Sóng Xanh từ nút trước
   const applyCoordination = (offset: number, predictedCars: number) => {

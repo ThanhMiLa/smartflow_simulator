@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from 'react';
-import { Zap } from 'lucide-react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { Zap, RotateCcw } from 'lucide-react';
 import { useTrafficLogic } from './hooks/useTrafficLogic';
 import { SimulatorCanvas, type SimulatorRef } from './components/SimulatorCanvas';
 import { Dashboard } from './components/Dashboard';
@@ -12,13 +12,15 @@ import { Footer } from './components/Footer';
 import { Modals } from './components/Modals';
 import type { LogEntry, LogType, SystemConfig } from './types';
 
-const OFFSET = 36;
+const OFFSET = 25;
 
 export default function App() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [config, setConfig] = useState<SystemConfig>({ x: 2, distance: 500, speed: 50 });
+  const [config, setConfig] = useState<SystemConfig>({ x: 1, distance: 500, speed: 50 });
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
   const simRef = useRef<SimulatorRef>(null);
+  const pendingCoordRef = useRef<number | null>(null);
 
   const addLog = useCallback((msg: string, type: LogType = 'info') => {
     setLogs(prev => [{ id: Date.now() + Math.random(), time: new Date().toLocaleTimeString('vi-VN', { hour12: false }), msg, type }, ...prev].slice(0, 100));
@@ -32,33 +34,43 @@ export default function App() {
     return simRef.current?.getWaitingCarsB() || 0;
   }, []);
 
-  const nodeA = useTrafficLogic('GREEN', 22, 'NODE A', addLog, getWaitingCarsA);
-  const nodeB = useTrafficLogic('RED', 50, 'NODE B', addLog, getWaitingCarsB);
+  const nodeA = useTrafficLogic('GREEN', 22, 'NODE A', addLog, getWaitingCarsA, isPaused);
+  const nodeB = useTrafficLogic('RED', 50, 'NODE B', addLog, getWaitingCarsB, isPaused);
 
   const handleTestCase = (testCase: number, K: number) => {
+    if (simRef.current) simRef.current.reset();
+    
     addLog(`--- BẮT ĐẦU TEST KỊCH BẢN ${testCase} ---`, 'info');
     
     // Gán kịch bản cho B
     if (testCase === 1) nodeB.forceState('RED', 60); 
     else if (testCase === 2) nodeB.forceState('RED', 15); 
-    else if (testCase === 3) nodeB.forceState('GREEN', 30); 
 
     // Đưa A về Đỏ 3s để gom K xe lại
     nodeA.forceState('RED', 3);
+
+    // Lưu lại K để đợi A chuyển xanh mới kích hoạt coordination
+    pendingCoordRef.current = K;
 
     // Spawn K xe ở Ngã tư A (thông qua Canvas Ref)
     if (simRef.current) {
       simRef.current.spawnTestPlatoon(K);
     }
-
-    // Chờ A chuyển Xanh (tự động sau 3s) và kích hoạt Làn Sóng Xanh
-    setTimeout(() => {
-      addLog(`[HỆ THỐNG] Kích hoạt Làn Sóng Xanh, đẩy tín hiệu dự báo tới B.`, 'warning');
-      nodeB.applyCoordination(OFFSET, Math.round(K / config.x));
-    }, 3200);
   };
 
+  // Logic kích hoạt Làn Sóng Xanh khi A chuyển sang Xanh
+  useEffect(() => {
+    if (nodeA.light === 'GREEN' && pendingCoordRef.current !== null) {
+      const K = pendingCoordRef.current;
+      pendingCoordRef.current = null;
+      addLog(`[HỆ THỐNG] Nút A chuyển XANH! Kích hoạt Làn Sóng Xanh tới B.`, 'warning');
+      nodeB.applyCoordination(OFFSET, Math.round(K / config.x));
+    }
+  }, [nodeA.light, nodeB, OFFSET, config.x, addLog]);
+
   const handleReset = () => {
+    setIsPaused(false);
+    pendingCoordRef.current = null;
     addLog(`--- HỆ THỐNG ĐÃ ĐƯỢC RESET ---`, 'success');
     if (simRef.current) {
       simRef.current.reset();
@@ -118,15 +130,32 @@ export default function App() {
               <div className="hidden md:block absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
               
               <div className="w-full max-w-[1000px] relative z-10 mx-auto">
+                {/* Nút STOP lớn và rực rỡ hơn */}
+                <button 
+                  onClick={() => setIsPaused(!isPaused)} 
+                  className={`absolute top-6 left-6 z-50 flex items-center gap-3 px-6 py-3 rounded-2xl border-2 text-sm font-black uppercase tracking-[0.15em] transition-all active:scale-90 shadow-[0_0_30px_rgba(244,63,94,0.3)] hover:shadow-[0_0_50px_rgba(244,63,94,0.5)] ${isPaused ? 'bg-rose-600 text-white border-white animate-pulse shadow-[0_0_40px_rgba(225,29,72,0.8)]' : 'bg-rose-500/20 text-rose-500 border-rose-500/50 hover:bg-rose-500/30'}`}
+                >
+                  {isPaused ? (
+                    <><RotateCcw size={20} className="animate-spin-slow" /> TIẾP TỤC (RESUME)</>
+                  ) : (
+                    <><div className="w-3 h-3 rounded-sm bg-rose-500 shadow-[0_0_10px_#f43f5e]" /> DỪNG (STOP)</>
+                  )}
+                </button>
+
                 <SimulatorCanvas 
                   ref={simRef}
                   lightA={nodeA.light} timerA={nodeA.timer}
                   lightB={nodeB.light} timerB={nodeB.timer}
+                  isPaused={isPaused}
                 />
               </div>
             </div>
 
-            <Dashboard logs={logs} onTestCase={handleTestCase} onReset={handleReset} />
+            <Dashboard 
+              logs={logs} 
+              onTestCase={handleTestCase} 
+              onReset={handleReset} 
+            />
           </div>
         </div>
       </section>
